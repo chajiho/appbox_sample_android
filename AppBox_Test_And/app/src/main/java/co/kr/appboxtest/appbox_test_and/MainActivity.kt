@@ -3,15 +3,21 @@ package co.kr.appboxtest.appbox_test_and
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Button
+import android.widget.ListView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import co.kr.appboxtest.appbox_test_and.databinding.ActivityMainBinding
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -25,6 +31,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        // 버튼 클릭 시 하단 메뉴 열기
+        findViewById<Button>(R.id.showBottomSheetButton).setOnClickListener {
+            showBottomSheet()
+        }
+
 
         val webView = binding.webView
         webView.settings.javaScriptEnabled = true
@@ -110,6 +123,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         webView.loadUrl(urlstr)
+
+
     }
 
     fun convertToJson(customItemList: MutableList<Item>): String {
@@ -124,6 +139,40 @@ class MainActivity : AppCompatActivity() {
             jsonArray.put(jsonObject)
         }
         return jsonArray.toString()
+    }
+
+    private fun showBottomSheet() {
+        // BottomSheetDialog 생성
+        val bottomSheetDialog = BottomSheetDialog(this)
+        val view = LayoutInflater.from(this).inflate(R.layout.bottom_manu_layout, null)
+
+        // 레이아웃을 BottomSheetDialog에 설정
+        bottomSheetDialog.setContentView(view)
+
+        // BottomSheetBehavior 가져오기
+//        val bottomSheet = bottomSheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
+//        val behavior = BottomSheetBehavior.from(bottomSheet!!)
+
+        // BottomSheet의 높이 설정 (필요에 따라 조정)
+//        behavior.peekHeight = 200 // 픽 높이 설정
+
+
+        // ListView에 대한 데이터 설정
+        val listView = view.findViewById<ListView>(R.id.funListView)
+//        val items = listOf("Item 1", "Item 2", "Item 3", "Item 4", "Item 5")
+
+//        val adapter = ArrayAdapter(this, R.layout.list_item_layout, items)
+        val adapter = CustomAdapter(this, funCheckList)
+        listView.adapter = adapter
+
+        // 레이아웃의 버튼에 대한 클릭 리스너 설정
+        view.findViewById<Button>(R.id.actionButton).setOnClickListener {
+            // 여기서 버튼 클릭 시 동작을 정의
+            bottomSheetDialog.dismiss() // 닫기
+        }
+
+        // BottomSheetDialog 표시
+        bottomSheetDialog.show()
     }
 }
 
